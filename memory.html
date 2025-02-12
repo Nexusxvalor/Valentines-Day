@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Jar</title>
+    <style>
+        @keyframes popOut {
+            0% { transform: scale(0.5); opacity: 0; }
+            40% { transform: scale(1.1); opacity: 1; }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        body {
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            background: url('Background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header-bar {
+            background: #ff4d6d;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 80%;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .header-bar::before {
+            content: "❤";
+            margin-right: 10px;
+        }
+
+        .header-bar::after {
+            content: "❤";
+            margin-left: 10px;
+        }
+
+        .memory-box {
+            width: 400px;
+            height: 500px;
+            background: url('back2.jpg') no-repeat center center;
+            background-size: cover;
+            border: 8px solid #ff4d6d;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #ff99a1;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        img {
+            width: 300px;
+            height: auto;
+            margin-top: 20px;
+            display: none;
+            cursor: pointer;
+        }
+
+        .show-image {
+            display: block !important;
+            animation: popOut 0.8s ease-out forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px;
+            cursor: pointer;
+            background: #ff6699;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Fullscreen Image Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ensure the image is responsive in fullscreen */
+        .modal-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 10px;
+            display: block;
+            margin: auto;
+            object-fit: contain;
+        }
+
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="memory-box">
+        <div class="header-bar">Memory Jar</div>
+        <button id="revealButton" onclick="showMemory()">Reveal a Memory</button>
+        <img id="memoryImage" src="" alt="Memory Image">
+        <button class="back-button" onclick="goBack()">Back to Menu</button>
+    </div>
+
+    <!-- Fullscreen Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
+
+    <script>
+        const memories = Array.from({ length: 19 }, (_, i) => `memory${i + 1}.png`);
+
+        // Preload all images
+        const preloadedImages = memories.map(src => {
+            const img = new Image();
+            img.src = src;
+            return img;
+        });
+
+        function showMemory() {
+            const imgElement = document.getElementById("memoryImage");
+            const revealButton = document.getElementById("revealButton");
+
+            // Disable button briefly to prevent spamming
+            revealButton.disabled = true;
+
+            // Pick a random memory image
+            const randomImage = memories[Math.floor(Math.random() * memories.length)];
+
+            if (imgElement.src) {
+                imgElement.classList.add('fade-out'); // Apply fade-out effect
+                setTimeout(() => {
+                    imgElement.src = randomImage;
+                    imgElement.classList.remove('fade-out');
+                    imgElement.style.display = "block";
+                    imgElement.classList.remove('show-image');
+                    void imgElement.offsetWidth; // Force reflow
+                    imgElement.classList.add('show-image');
+                    revealButton.disabled = false; // Re-enable button
+                }, 300);
+            } else {
+                imgElement.src = randomImage;
+                imgElement.style.display = "block";
+                imgElement.classList.add('show-image');
+                revealButton.disabled = false; // Ensure button is enabled
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'test.html';
+        }
+
+        // Open Fullscreen Modal when clicking an image
+        document.getElementById("memoryImage").addEventListener("click", function() {
+            if (!this.src) return; // Prevent empty image clicks
+            const modal = document.getElementById("imageModal");
+            const fullImage = document.getElementById("fullImage");
+
+            fullImage.src = this.src;
+            modal.style.display = "flex";
+        });
+
+        // Close the modal when clicking the close button
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
